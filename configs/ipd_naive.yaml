@@ -1,0 +1,111 @@
+defaults:
+    - base.yaml
+
+lora_count: 30
+experiment:
+    name: "ipd_naive"
+    base_seed: 0
+    nb_epochs: 1000
+    agent_buffer: false
+    keep_agent_buffer_count: ${lora_count}
+    agent_buffer_recent_k: -1
+    checkpoint_every_n_iterations: 50
+    stat_methods_for_live_wandb: "mllm.markov_games.ipd.ipd_statistics"
+
+common_agent_kwargs: &common_agent_kwargs
+    max_errors: 0
+    allow_reasoning: false
+    max_reasoning_chars: 0
+    cooperate_string: <A>
+    defect_string: <B>
+    strategy_prompt: ""
+    intro_prompt: |
+        Welcome to an iterated game. You are playing against another agent.
+
+        Game Rules:
+        1. In each round, both agents simultaneously choose to either play A or B.
+        2. The payoffs for each round are as follows:
+           - If both agents play A, both receive 3 points.
+           - If both agents play B, both receive 1 points.
+           - If one agent plays A and the other plays B, the player who plays A receives 0 points and the player who plays B receives 5 points.
+        3. The goal is to maximize your total points over all rounds.
+        4. You will see the previous play of the other player after the completion of a round.
+
+        In order to play A, you must write "<A>" and nothing else.
+        In order to play B, you must write "<B>" and nothing else.
+
+        During the entire game, you must only write "<A>" or "<B>". If you write anything else, your response will be considered as an error.
+
+        The game starts now:
+
+    goal_prompt: |
+        Your goal is to maximize your utility.
+
+agent_0_id: Alice
+agent_1_id: Bob
+agent_ids: ["Alice", "Bob"]
+
+markov_games:
+    runner_method_name: LinearRunner
+    runner_kwargs: {}
+    simulation_class_name: IPD
+    simulation_init_args:
+        rounds_per_game: 10
+        cooperate_actions: ["<A>"]
+        defect_actions: ["<B>"]
+        reward: 3
+        punishment: 1
+        temptation: 5
+        sucker: 0
+    agents:
+        0:
+            agent_id: ${agent_0_id}
+            agent_name: Alice
+            agent_class_name: IPDAgent
+            policy_id: base_llm/agent_adapter
+            init_kwargs:
+                <<: *common_agent_kwargs
+
+        1:
+            agent_id: ${agent_1_id}
+            agent_name: Bob
+            agent_class_name: IPDAgent
+            policy_id: base_llm/agent_adapter
+            init_kwargs:
+                <<: *common_agent_kwargs
+
+models:
+    base_llm:
+        init_args:
+            model_name: Qwen/Qwen2.5-7B-Instruct
+            enable_thinking: null
+            regex_max_attempts: 1
+            inference_backend_init_kwargs:
+                enforce_eager: False
+                gpu_memory_utilization: 0.5
+                max_loras: ${lora_count}
+                max_cpu_loras : ${lora_count}
+                enable_sleep_mode: False # to save on cpu memory
+                enable_lora: True
+trainers:
+    agent_trainer:
+        kwargs:
+            reward_normalizing_constant: 5.0
+
+train_on_which_data:
+    agent_trainer: ${agent_ids}
+
+optimizers:
+    agent_optimizer:
+        module_pointer: ["base_llm", "agent_adapter"]
+        optimizer_class_name: torch.optim.Adam
+        init_args:
+            lr: 3e-6
+            weight_decay: 0.0
+
+    critic_optimizer:
+        module_pointer: agent_critic
+        optimizer_class_name: torch.optim.Adam
+        init_args:
+            lr: 3e-6
+            weight_decay: 0.0

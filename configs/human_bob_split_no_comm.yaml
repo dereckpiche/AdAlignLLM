@@ -1,0 +1,30 @@
+# To quickly check if code still runs
+experiment:
+    name: "human_bob_split_no_comm_test_seed4321"
+    nb_epochs: 1
+    nb_matches_per_iteration: 1
+    seed_group_size: 1
+    train: false
+    wandb_enabled: false
+    base_seed: 4321
+
+defaults:
+    - split_no_comm_vanilla_ad_align.yaml
+
+
+markov_games:
+    simulation_init_args:
+        nb_of_rounds: 5
+    agents:
+        1:
+            agent_name: Bob
+            policy_id: human_policy
+
+
+models:
+    base_llm:
+        init_args:
+            initial_adapter_paths:
+                agent_adapter: LLMnegotiation/split_no_comm_vanilla_ad_align_seed4321/seed_4321/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter # ensure the path is on disk
+            inference_backend_init_kwargs:
+                enforce_eager: True

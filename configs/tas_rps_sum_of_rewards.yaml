@@ -1,0 +1,9 @@
+defaults:
+    - tas_rps_naive.yaml
+
+experiment:
+    name: "tas_rps_sum_of_rewards"
+
+trainers:
+    agent_trainer:
+        class: TrainerSumRewards

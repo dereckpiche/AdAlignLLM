@@ -1,0 +1,53 @@
+benchmark:
+  name: benchmark_tas_rps
+  template_config: configs/benchmark_matrix_template.yaml
+  output_root: ${oc.env:SCRATCH}/llm_negotiation/benchmark_results/
+
+environment:
+  simulation_class_name: TrustAndSplitRPSSimulation
+  simulation_init_args:
+      nb_of_rounds: 10
+      quota_messages_per_agent_per_round: 1
+      alternating_hands: False
+
+markov_games:
+  group_by_round: True
+
+model:
+  model_name: Qwen/Qwen2.5-7B-Instruct
+
+adapters:
+  trained_adapter_1: LLMnegotiation/tas_rps_naive/seed_0/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter # ensure the path is on disk
+  trained_adapter_2: LLMnegotiation/tas_rps_sum_of_rewards/seed_0/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter  # ensure the path is on disk
+  trained_adapter_3: LLMnegotiation/tas_rps_vanilla_ad_align/seed_0/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter # ensure the path is on disk
+
+common_agent_kwargs: &common_agent_kwargs
+    goal: "Maximize your total points over the whole game."
+    num_message_chars: 500
+    message_start_end_format: true
+    proposal_start_end_format: true
+
+agents:
+  - name: naive
+    agent_class_name: TrustAndSplitRPSAgent
+    policy_id: bench_llm/trained_adapter_1
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+  - name: coop
+    agent_class_name: TrustAndSplitRPSAgent
+    policy_id: bench_llm/trained_adapter_2
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+  - name: trained
+    agent_class_name: TrustAndSplitRPSAgent
+    policy_id: bench_llm/trained_adapter_3
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+
+options:
+  include_self_play: true
+  train: false
+  resume: true
+  dry_run: false
+  csv_summary: true
+  render_keyword: nego

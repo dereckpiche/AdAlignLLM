@@ -1,0 +1,88 @@
+defaults:
+    - base.yaml
+
+lora_count: 30
+experiment:
+    name: "tas_rps_naive"
+    nb_epochs: 3000
+    agent_buffer: false
+    keep_agent_buffer_count: ${lora_count}
+    agent_buffer_recent_k: -1
+    checkpoint_every_n_iterations: 50
+    seed_group_size: 8
+    stat_methods_for_live_wandb: "mllm.markov_games.negotiation.negotiation_statistics"
+
+common_agent_kwargs: &common_agent_kwargs
+    goal: "Maximize your total points over the whole game."
+    num_message_chars: 500
+    message_start_end_format: true
+    proposal_start_end_format: true
+
+agent_0_id: Alice
+agent_1_id: Bob
+agent_ids: ["Alice", "Bob"]
+
+markov_games:
+    group_by_round: True # This will merge all timesteps of a round into a single timestep
+    simulation_class_name: TrustAndSplitRPSSimulation
+    simulation_init_args:
+        nb_of_rounds: 10
+        quota_messages_per_agent_per_round: 1
+        alternating_hands: False
+
+    agents:
+        0:
+            agent_id: ${agent_0_id}
+            agent_name: Alice
+            agent_class_name: TrustAndSplitRPSAgent
+            policy_id: base_llm/agent_adapter
+            init_kwargs:
+                <<: *common_agent_kwargs
+
+        1:
+            agent_id: ${agent_1_id}
+            agent_name: Bob
+            agent_class_name: TrustAndSplitRPSAgent
+            policy_id: base_llm/agent_adapter
+            init_kwargs:
+                <<: *common_agent_kwargs
+
+temperature: 1.0
+
+models:
+    base_llm:
+        init_args:
+            model_name: Qwen/Qwen2.5-7B-Instruct
+            enable_thinking: null
+            regex_max_attempts: 1
+            inference_backend_init_kwargs:
+                enforce_eager: False
+                gpu_memory_utilization: 0.5
+                max_loras: ${lora_count}
+                max_cpu_loras : ${lora_count}
+                enable_sleep_mode: True
+                enable_lora: True
+
+optimizers:
+    agent_optimizer:
+        module_pointer: ["base_llm", "agent_adapter"]
+        optimizer_class_name: torch.optim.Adam
+        init_args:
+            lr: 3e-6
+            weight_decay: 0.0
+
+    critic_optimizer:
+        module_pointer: agent_critic
+        optimizer_class_name: torch.optim.Adam
+        init_args:
+            lr: 3e-6
+            weight_decay: 0.0
+
+trainers:
+    agent_trainer:
+        kwargs:
+            discount_factor: 0.96
+            use_gradient_checkpointing: True
+            mini_batch_size: 1
+            reward_normalizing_constant: 100.0
+            kl_coeff: 0.001

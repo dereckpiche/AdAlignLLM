@@ -1,0 +1,131 @@
+hydra:
+    run:
+        dir: "${oc.env:SCRATCH}/llm_negotiation/${now:%Y_%m}/${experiment.name}"
+    job:
+        chdir: false
+
+experiment:
+    wandb_enabled: true
+    nb_epochs: 1000
+    nb_matches_per_iteration: 64
+    reinit_matches_each_it: true
+    checkpoint_every_n_iterations: 50
+    start_epoch: 0
+    resume_experiment: true
+    base_seed: 0
+    seed_group_size: 1
+    train: true
+    stat_methods_for_live_wandb: "mllm.markov_games.negotiation.negotiation_statistics"
+
+logging:
+    wandb:
+        enabled: false
+        project: llm-negotiation
+        entity: null
+        mode: online  # online|offline|disabled
+        name: null
+        group: null
+        tags: []
+        notes: null
+
+temperature: 1.0
+
+markov_games:
+    runner_method_name: LinearRunner
+    runner_kwargs: {}
+
+models:
+    base_llm:
+        class: LeanLocalLLM
+        init_args:
+            llm_id: base_llm
+            model_name: Qwen/Qwen2.5-7B-Instruct #  Qwen/Qwen3-4B-Instruct-2507, Qwen/Qwen2.5-7B-Instruct
+            inference_backend: vllm # vllm, dummy
+            hf_kwargs:
+                device_map: "auto"
+                torch_dtype: "bfloat16"
+                max_memory: {0: "20GiB"}
+                attn_implementation: "flash_attention_2"
+            inference_backend_init_kwargs:
+                enable_lora: true
+                seed: ${experiment.base_seed}
+                enable_prefix_caching: True
+                max_model_len: 1e4
+                gpu_memory_utilization: 0.5
+                dtype: "bfloat16"
+                trust_remote_code: True
+                max_lora_rank: 32
+            inference_backend_sampling_params:
+                temperature: ${temperature}
+                top_p: 1.0
+                max_tokens: 400
+                top_k: -1
+                logprobs: 0
+            adapter_configs:
+                agent_adapter:
+                    task_type: CAUSAL_LM
+                    r: 32
+                    lora_alpha: 64
+                    lora_dropout: 0.0
+                    target_modules: all-linear
+                critic_adapter:
+                    task_type: CAUSAL_LM
+                    r: 32
+                    lora_alpha: 64
+                    lora_dropout: 0.0
+                    target_modules: all-linear
+
+critics:
+    agent_critic:
+        module_pointer: ["base_llm", "critic_adapter"]
+
+optimizers:
+    agent_optimizer:
+        module_pointer: ["base_llm", "agent_adapter"]
+        optimizer_class_name: torch.optim.Adam
+        init_args:
+            lr: 1e-6
+            weight_decay: 0.0
+
+    critic_optimizer:
+        module_pointer: agent_critic
+        optimizer_class_name: torch.optim.Adam
+        init_args:
+            lr: 3e-6
+            weight_decay: 0.0
+
+trainers:
+    agent_trainer:
+        class: TrainerNaive
+        module_pointers:
+            policy: ["base_llm", "agent_adapter"]
+            policy_optimizer: agent_optimizer
+            critic: agent_critic
+            critic_optimizer: critic_optimizer
+        kwargs:
+            entropy_coeff: 0.0
+            entropy_topk: null
+            entropy_mask_regex: null
+            kl_coeff: 0.0
+            gradient_clipping: 1.0
+            restrict_tokens: null
+            mini_batch_size: 4
+            use_gradient_checkpointing: True
+            temperature: ${temperature}
+            device: "cuda:0"
+            use_gae: False
+            whiten_advantages: False
+            whiten_advantages_time_step_wise: False
+            skip_discounted_state_visitation: True
+            use_gae_lambda_annealing: False
+            gae_lambda_annealing_method: None
+            gae_lambda_annealing_method_params: None
+            gae_lambda_annealing_limit: 0.95
+            discount_factor: 0.9
+            use_rloo: True
+            enable_tokenwise_logging: False
+            pg_loss_normalization: "nb_tokens"
+            truncated_importance_sampling_ratio_cap: 2.0
+
+train_on_which_data:
+    agent_trainer: ${agent_ids}

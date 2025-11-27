@@ -1,0 +1,25 @@
+defaults:
+    - tas_rps_naive.yaml
+
+experiment:
+    name: "tas_rps_vanilla_ad_align"
+    nb_epochs: 3000
+    agent_buffer: true
+    checkpoint_every_n_iterations: 10
+
+trainers:
+    agent_trainer:
+        class: TrainerAdAlign
+        kwargs:
+            ad_align_force_coop_first_step: False
+            ad_align_clipping: null
+            ad_align_gamma: 0.96
+            ad_align_exclude_k_equals_t: True
+            ad_align_use_sign: False
+            ad_align_beta: 2.0
+            use_old_ad_align: True
+            use_time_regularization: False
+            use_rloo: True
+            rloo_branch: False
+            reuse_baseline: False
+            reward_normalizing_constant: 100.0

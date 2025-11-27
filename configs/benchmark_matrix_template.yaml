@@ -1,0 +1,81 @@
+defaults:
+    - base.yaml
+hydra:
+    run:
+        dir: "path/to/benchmark/sub_directory"
+    job:
+        chdir: false
+
+experiment:
+    name: "benchmark_nego"
+    nb_epochs: 1
+    nb_matches_per_iteration: 256
+    seed_group_size: 1
+    train: false
+    wandb_enabled: false
+
+# Don't init that stuff
+critics:
+    agent_critic: null
+optimizers:
+    agent_optimizer: null
+    critic_optimizer: null
+
+markov_games:
+    group_by_round: True
+    simulation_class_name: "name/for/your/simulation"
+    simulation_init_args: "your/simulation/args"
+
+
+models:
+    base_llm: null #
+
+    bench_llm:
+        class: LeanLocalLLM
+        init_args:
+            llm_id: bench_llm
+            model_name: "your/model/name" # "Qwen/Qwen2.5-0.5B-Instruct" # Qwen/Qwen3-4B-Instruct-2507
+            inference_backend: vllm #
+            hf_kwargs:
+                device_map: "auto"
+                torch_dtype: "bfloat16"
+                max_memory: {0: "20GiB"}
+                attn_implementation: "flash_attention_2"
+            inference_backend_init_kwargs:
+                enable_lora: True
+                enforce_eager: True
+                seed: ${experiment.base_seed}
+                enable_prefix_caching: True
+                max_model_len: 1e4
+                gpu_memory_utilization: 0.5
+                dtype: "bfloat16"
+                trust_remote_code: True
+                max_lora_rank: 32
+            inference_backend_sampling_params:
+                temperature: ${temperature}
+                top_p: 1.0
+                max_tokens: 400
+                top_k: -1
+                logprobs: 0
+            adapter_configs:
+                trained_adapter_1:
+                    task_type: CAUSAL_LM
+                    r: 32
+                    lora_alpha: 64
+                    lora_dropout: 0.0
+                    target_modules: all-linear
+                trained_adapter_2:
+                    task_type: CAUSAL_LM
+                    r: 32
+                    lora_alpha: 64
+                    lora_dropout: 0.0
+                    target_modules: all-linear
+                trained_adapter_3:
+                    task_type: CAUSAL_LM
+                    r: 32
+                    lora_alpha: 64
+                    lora_dropout: 0.0
+                    target_modules: all-linear
+
+trainers:
+    agent_trainer: null

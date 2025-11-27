@@ -1,0 +1,75 @@
+benchmark:
+  name: benchmark_ipd
+  template_config: configs/benchmark_matrix_template.yaml
+  output_root: ${oc.env:SCRATCH}/llm_negotiation/benchmark_results/
+
+environment:
+  simulation_class_name: IPD
+  simulation_init_args:
+      rounds_per_game: 10
+      cooperate_actions: ["<A>"]
+      defect_actions: ["<B>"]
+      reward: 3
+      punishment: 1
+      temptation: 5
+      sucker: 0
+
+model:
+  model_name: Qwen/Qwen2.5-7B-Instruct
+
+adapters:
+  trained_adapter_1: LLMnegotiation/ipd_vanilla_ad_align/seed_0/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter # ensure the path is on disk
+
+common_agent_kwargs: &common_agent_kwargs
+    max_errors: 0
+    allow_reasoning: false
+    max_reasoning_chars: 0
+    cooperate_string: <A>
+    defect_string: <B>
+    strategy_prompt: ""
+    intro_prompt: |
+        Welcome to an iterated game. You are playing against another agent.
+
+        Game Rules:
+        1. In each round, both agents simultaneously choose to either play A or B.
+        2. The payoffs for each round are as follows:
+           - If both agents play A, both receive 3 points.
+           - If both agents play B, both receive 1 points.
+           - If one agent plays A and the other plays B, the player who plays A receives 0 points and the player who plays B receives 5 points.
+        3. The goal is to maximize your total points over all rounds.
+        4. You will see the previous play of the other player after the completion of a round.
+
+        In order to play A, you must write "<A>" and nothing else.
+        In order to play B, you must write "<B>" and nothing else.
+
+        During the entire game, you must only write "<A>" or "<B>". If you write anything else, your response will be considered as an error.
+
+        The game starts now:
+
+    goal_prompt: |
+        Your goal is to maximize your utility.
+
+agents:
+  - name: greedy
+    agent_class_name: AlwaysDefectIPDAgent
+    policy_id: bench_llm/trained_adapter_1 # placeholder, does not matter
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+  - name: coop
+    agent_class_name: AlwaysCooperateIPDAgent
+    policy_id: bench_llm/trained_adapter_1 # placeholder, does not matter
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+  - name: trained
+    agent_class_name: IPDAgent
+    policy_id: bench_llm/trained_adapter_1
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+
+options:
+  include_self_play: true
+  train: false
+  resume: true
+  dry_run: false
+  csv_summary: true
+  render_keyword: ipd

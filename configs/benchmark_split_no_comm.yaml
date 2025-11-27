@@ -1,0 +1,48 @@
+benchmark:
+  name: benchmark_split_no_comm
+  template_config: configs/benchmark_matrix_template.yaml
+  output_root: ${oc.env:SCRATCH}/llm_negotiation/benchmark_results/
+
+environment:
+  simulation_class_name: NoPressSimulation
+  simulation_init_args:
+      nb_of_rounds: 10
+      quota_messages_per_agent_per_round: 0
+      game_type: "10-1-ties"
+      atleast_one_conflict: True
+      item_types: ['hats', 'books', 'balls']
+
+
+model:
+  model_name: Qwen/Qwen2.5-7B-Instruct
+
+adapters:
+  trained_adapter_1: LLMnegotiation/split_no_comm_vanilla_ad_align/seed_0/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter # ensure the path is on disk
+
+common_agent_kwargs: &common_agent_kwargs
+    goal: "Maximize your total points over the whole game."
+
+agents:
+  - name: trained
+    agent_class_name: NoPressAgent
+    policy_id: bench_llm/trained_adapter_1
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+  - name: naive
+    agent_class_name: HardCodedNegoGreedyPolicy
+    policy_id: bench_llm/trained_adapter_1 # placeholder, does not matter
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+  - name: coop
+    agent_class_name: HardCodedNegoWelfareMaximizingPolicy
+    policy_id: bench_llm/trained_adapter_1 # placeholder, does not matter
+    agent_class_kwargs:
+      <<: *common_agent_kwargs
+
+options:
+  include_self_play: true
+  train: false
+  resume: true
+  dry_run: false
+  csv_summary: true
+  render_keyword: nego

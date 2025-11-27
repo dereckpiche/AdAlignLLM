@@ -1,0 +1,9 @@
+defaults:
+    - split_no_comm_naive.yaml
+
+experiment:
+    name: "split_no_comm_sum_of_rewards"
+
+trainers:
+    agent_trainer:
+        class: TrainerSumRewards

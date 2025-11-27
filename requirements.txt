@@ -1,0 +1,21 @@
+hydra-core
+torch==2.7.1
+datasets
+transformers
+trl
+peft
+matplotlib
+tensorboard # still used by legacy logging hooks in mllm
+wandb # optional; enable via logging.wandb.enabled in config
+diplomacy
+optimum
+auto-gptq
+backoff
+pybase64
+pydantic
+httpx
+openai
+jsonschema
+ipykernel
+rstr
+vllm

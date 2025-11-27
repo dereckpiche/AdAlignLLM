@@ -1,0 +1,42 @@
+defaults:
+   - tas_rps_startend_naive.yaml
+experiment:
+   name: naive_vs_fixed_ad_align
+
+
+agent_0_id: Alice
+agent_1_id: Bob
+agent_ids: ["Alice", "Bob"]
+fixed_ad_align_adapter_path: path/to/tit_for_tat_tas_rps_policy/agent_adapter
+
+
+markov_games:
+   agents:
+       0:
+           agent_id: ${agent_0_id}
+           agent_name: Alice
+           agent_class_name: TrustAndSplitRPSAgent
+           policy_id: base_llm/agent_adapter
+       1:
+           agent_id: ${agent_1_id}
+           agent_name: Bob
+           agent_class_name: TrustAndSplitRPSAgent
+           policy_id: base_llm/fixed_ad_align_adapter
+
+
+models:
+   base_llm:
+       init_args:
+           initial_adapter_paths:
+               fixed_ad_align_adapter: ${fixed_ad_align_adapter_path}
+           adapter_configs:
+               fixed_ad_align_adapter:
+                   task_type: CAUSAL_LM
+                   r: 32
+                   lora_alpha: 64
+                   lora_dropout: 0.0
+                   target_modules: all-linear
+
+
+train_on_which_data:
+   agent_trainer: [Alice]

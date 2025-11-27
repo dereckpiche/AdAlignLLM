@@ -1,0 +1,31 @@
+# To quickly check if code still runs
+experiment:
+    name: "human_bob_tas_rps_tit_for_tat_test"
+    nb_epochs: 1
+    nb_matches_per_iteration: 1
+    seed_group_size: 1
+    train: false
+    wandb_enabled: false
+    base_seed: 42
+
+defaults:
+    - tas_rps_vanilla_ad_align.yaml
+
+human_alice_adapter_path: ${oc.env:HUMAN_ALICE_ADAPTER_PATH,"path/to/human_alice/agent_adapter"}
+
+markov_games:
+    simulation_init_args:
+        nb_of_rounds: 5
+    agents:
+        0:
+            agent_name: Alice
+            policy_id: human_policy
+
+
+models:
+    base_llm:
+        init_args:
+            initial_adapter_paths:
+                agent_adapter: LLMnegotiation/tas_rps_vanilla_ad_align/seed42/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter # ensure the path is on disk
+            inference_backend_init_kwargs:
+                enforce_eager: True
