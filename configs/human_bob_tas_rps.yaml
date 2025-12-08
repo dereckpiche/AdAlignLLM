@@ -11,8 +11,6 @@ experiment:
 defaults:
     - tas_rps_vanilla_ad_align.yaml
 
-human_alice_adapter_path: ${oc.env:HUMAN_ALICE_ADAPTER_PATH,"path/to/human_alice/agent_adapter"}
-
 markov_games:
     simulation_init_args:
         nb_of_rounds: 5

@@ -1,20 +1,12 @@
 # Learning Robust Social Strategies with Large Language Models
 
-This repository accompanies [*Learning Robust Social Strategies with Large Language Models*](https://arxiv.org/pdf/2511.19405v1) and provides everything needed to reproduce its experiments. It lets you pit heterogeneous LLM agents against each other in social dilemmas, fine-tune them with Advantage Alignment, and inspect how negotiation transcripts evolve round by round. The code is built around async multi-turn agents that share a base model and swap LoRA adapters per agent or policy.
+This repository accompanies [*Learning Robust Social Strategies with Large Language Models*](https://arxiv.org/pdf/2511.19405v1) and provides everything needed to reproduce its experiments. It enables you to fine-tune LLMs with RL, Advantage Alignment, and pit heterogeneous LLM agents against each other in social dilemmas.
 
-If you are new here, think of the repo as:
+## Key Features
 
-- A collection of Markov game environments (Iterated Prisoner's Dilemma, Trust & Split variants, negotiation tasks, etc.) implemented with a consistent simulator and agent abstraction.
-- A LoRA-first multi-agent orchestration layer that launches async multi-turn generations across many agents or policies (see `run_markov_games.py` and the `LinearRunner`), hot-swapping per-agent LoRA adapters on a shared base model via vLLM.
-- A training stack that turns conversation logs into trajectories, applies multiple credit assignment methods, and fine-tunes LLM policies via RL or supervised objectives.
-- Runners and analytics scripts (renderers, statistics collectors) so you can quickly iterate on new environments or policy variants.
-
----
-
-## Key capabilities
-
-- **Async multi-agent multi-turn rollouts**: Agents act concurrently at each timestep via `asyncio`, and multiple Markov games can run in parallel. vLLM’s async engine plus `LoRARequest` support lets you hot-swap adapters per agent without reloading the base model.
-- **LoRA training for many agents**: `AdapterWrapper` registers one adapter per agent on a shared HF model. `TrainerAdAlign`, `TrainerNaive`, and `TrainerSumRewards` then optimize the corresponding adapters.
+- **Multi-agent Markov games**: Iterated Prisoner's Dilemma, Trust & Split variants.
+- **Async multi-turn rollouts**: Agents act concurrently via `asyncio` with hot-swappable LoRA adapters on shared base models (vLLM).
+- **Analysis tools**: Renderers and statistics collectors for qualitative evaluation.
 
 ---
 
@@ -25,26 +17,17 @@ Recommended: **Python ≥ 3.11** and **CUDA ≥ 12.4**.
 ```bash
 git clone https://github.com/dereckpiche/AdAlignLLM.git
 cd AdAlignLLM
-
 pip install -r requirements.txt
 pip install flash_attn --no-build-isolation
 pip install -e .
-
-
-and run
-
-```python
-import sys
-sys.path.append('your-path-to-the-repo')
 ```
-in order to add the repository to your system path.
 
-To run with OpenAI API models, set
+For OpenAI API models:
 ```bash
-export OPENAI_API_KEY=your/api/key
+export OPENAI_API_KEY=your_api_key
 ```
 
-## Development
+## Development Setup
 
 ```bash
 pip install pre-commit
@@ -56,23 +39,38 @@ export WANDB_PROJECT=llm_negotiation
 
 ## Running Experiments
 
-In order to launch a policy gradient training loop, use
+Results are saved to `$SCRATCH/llm_negotiation/`. Set the environment variable if needed:
 ```bash
-python run.py --config-name your-config
+export SCRATCH=/path/to/scratch/directory
 ```
-Example: `python run.py --config-name tas_rps_vanilla_ad_align.yaml`.
 
-To add render files to your output folder, use
+### Training
+Launch policy gradient training:
 ```bash
-python render.py --simulation_name path
+python run.py --config-name tas_rps_vanilla_ad_align.yaml
 ```
-Example: `python render.py --nego your-path-to-the-experiment`.
 
-To play against a trained model in Trust & Split RPS, run
+### Rendering Results
+Generate visualizations:
+```bash
+python render.py --nego /path/to/experiment
+```
+
+## Evaluation
+
+Download trained adapters from [HuggingFace](https://huggingface.co/LLMnegotiation) and update config paths accordingly.
+
+### Human vs AI
 ```bash
 python run.py --config-name human_bob_tas_rps.yaml
+python render.py --nego /path/to/experiment --html
 ```
-Ensure the agent adapter path in that config point to your downloaded weights from https://huggingface.co/LLMnegotiation.
+
+### Benchmarking
+```bash
+python run_benchmarks.py --config-name benchmark_tas_rps.yaml
+python render_benchmarks.py /path/to/benchmark/results
+```
 
 ## Adding a Markov Game environment
 
