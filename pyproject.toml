@@ -3,9 +3,7 @@ name = "mllm"
 version = "0.1.0"
 description = "Multi-agent reinforcement learning for large language models"
 authors = [
-  { name = "Dereck Piche", email = "pichedereck@gmail.com"},
-  { name = "Muqeeth Mohammed" },
-  { name = "Uday Kapoor" }
+  { name = "Anonymous" }
 ]
 license = { text = "MIT" }
 readme = "README.md"
@@ -13,9 +11,7 @@ requires-python = ">=3.9"
 
 
 [project.urls]
-Homepage = "https://github.com/dereckpiche/llm_negotiation"
-Repository = "https://github.com/dereckpiche/llm_negotiation"
-Issues = "https://github.com/dereckpiche/llm_negotiation/issues"
+# URLs will be provided upon publication
 
 [build-system]
 requires = ["setuptools>=64", "wheel"]

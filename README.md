@@ -1,6 +1,6 @@
 # Learning Robust Social Strategies with Large Language Models
 
-This repository accompanies [*Learning Robust Social Strategies with Large Language Models*](https://arxiv.org/pdf/2511.19405v1) and provides everything needed to reproduce its experiments. It enables you to fine-tune LLMs with RL, Advantage Alignment, and pit heterogeneous LLM agents against each other in social dilemmas.
+This repository accompanies *Learning Robust Social Strategies with Large Language Models* (anonymous submission) and provides everything needed to reproduce its experiments. It enables you to fine-tune LLMs with RL, Advantage Alignment, and pit heterogeneous LLM agents against each other in social dilemmas.
 
 ## Key Features
 
@@ -15,8 +15,7 @@ This repository accompanies [*Learning Robust Social Strategies with Large Langu
 Recommended: **Python ≥ 3.11** and **CUDA ≥ 12.4**.
 
 ```bash
-git clone https://github.com/dereckpiche/AdAlignLLM.git
-cd AdAlignLLM
+# Clone this repository
 pip install -r requirements.txt
 pip install flash_attn --no-build-isolation
 pip install -e .
@@ -58,7 +57,7 @@ python render.py --nego /path/to/experiment
 
 ## Evaluation
 
-Download trained adapters from [HuggingFace](https://huggingface.co/LLMnegotiation) and update config paths accordingly.
+Download trained adapters (links will be provided upon publication) and update config paths accordingly.
 
 ### Human vs AI
 ```bash

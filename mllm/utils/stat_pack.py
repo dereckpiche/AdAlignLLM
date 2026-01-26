@@ -17,9 +17,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
-plt.style.use(
-    "https://raw.githubusercontent.com/dereckpiche/DedeStyle/refs/heads/main/dedestyle.mplstyle"
-)
+# Use default matplotlib style for anonymous submission
+# plt.style.use("default")
 
 import wandb
 
