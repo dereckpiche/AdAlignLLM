@@ -100,6 +100,7 @@ class BaseTrainer(ABC):
         importance_sampling_strategy: Literal[
             "per_token", "per_sequence"
         ] = "per_token",
+        no_rloo_grouping: bool = False,
     ):
         """
         Initialize the REINFORCE trainer with reward shaping for multi-agent or single-agent training.
@@ -218,6 +219,7 @@ class BaseTrainer(ABC):
             truncated_importance_sampling_ratio_cap
         )
         self.importance_sampling_strategy = importance_sampling_strategy
+        self.no_rloo_grouping = no_rloo_grouping
 
     def mask_non_restricted_token_logits(self, logits: torch.Tensor) -> torch.Tensor:
         """
@@ -841,7 +843,7 @@ class BaseTrainer(ABC):
                     trajectories.crn_ids.unique().shape[0]
                     != trajectories.crn_ids.shape[0]
                 )
-                if is_grouped_by_rng:
+                if is_grouped_by_rng and not self.no_rloo_grouping:
                     for crn_id in trajectories.crn_ids.unique():
                         rng_mask = trajectories.crn_ids == crn_id
                         rng_advantages = padded_advantages[rng_mask]

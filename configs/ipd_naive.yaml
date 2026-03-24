@@ -11,6 +11,7 @@ experiment:
     agent_buffer_recent_k: -1
     checkpoint_every_n_iterations: 50
     stat_methods_for_live_wandb: "mllm.markov_games.ipd.ipd_statistics"
+    nb_matches_per_iteration: 128
 
 common_agent_kwargs: &common_agent_kwargs
     max_errors: 0

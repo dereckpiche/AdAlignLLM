@@ -1,0 +1,8 @@
+defaults:
+    - split_no_comm_vanilla_ad_align.yaml
+
+experiment:
+    name: "split_no_comm_vanilla_ad_align_no_agent_buffer_seed1337"
+    agent_buffer: false
+    checkpoint_every_n_iterations: 50
+    base_seed: 1337

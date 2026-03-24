@@ -18,7 +18,7 @@ Recommended: **Python ≥ 3.11** and **CUDA ≥ 12.4**.
 git clone https://github.com/dereckpiche/AdAlignLLM.git
 cd AdAlignLLM
 pip install -r requirements.txt
-pip install flash_attn --no-build-isolation
+pip install flash-attn==2.8.3 --no-deps --no-build-isolation --no-binary flash-attn
 pip install -e .
 ```
 

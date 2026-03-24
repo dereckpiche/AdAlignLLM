@@ -1,0 +1,10 @@
+defaults:
+    - split_no_comm_vanilla_ad_align.yaml
+
+experiment:
+    name: "split_no_comm_vanilla_ad_align_no_group_baseline"
+
+trainers:
+    agent_trainer:
+        kwargs:
+            no_rloo_grouping: True

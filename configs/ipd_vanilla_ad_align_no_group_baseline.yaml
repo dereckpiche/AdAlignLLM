@@ -1,0 +1,12 @@
+defaults:
+    - ipd_vanilla_ad_align.yaml
+
+experiment:
+    name: "ipd_vanilla_ad_align_no_group_baseline"
+    nb_epochs: 1000
+    wandb_enabled: false
+
+trainers:
+    agent_trainer:
+        kwargs:
+            no_rloo_grouping: True

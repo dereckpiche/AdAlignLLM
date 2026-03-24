@@ -1,0 +1,9 @@
+defaults:
+    - ipd_vanilla_ad_align.yaml
+
+experiment:
+    name: "ipd_vanilla_ad_align_no_agent_buffer_seed42"
+    nb_epochs: 1000
+    agent_buffer: false
+    checkpoint_every_n_iterations: 50
+    base_seed: 42
