@@ -1,0 +1,7 @@
+defaults:
+    - tas_rps_vanilla_ad_align.yaml
+
+experiment:
+    name: "tas_rps_vanilla_ad_align_no_agent_buffer"
+    agent_buffer: false
+    checkpoint_every_n_iterations: 50

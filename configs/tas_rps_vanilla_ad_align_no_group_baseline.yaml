@@ -1,0 +1,10 @@
+defaults:
+    - tas_rps_vanilla_ad_align.yaml
+
+experiment:
+    name: "tas_rps_vanilla_ad_align_no_group_baseline"
+
+trainers:
+    agent_trainer:
+        kwargs:
+            no_rloo_grouping: True
