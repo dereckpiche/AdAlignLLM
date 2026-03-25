@@ -103,6 +103,7 @@ async def generate_and_train(cfg: dict, base_seed: int) -> None:
             config=cfg,
             resume="allow",
             id=wandb_run_id,
+            mode=os.environ.get("WANDB_MODE", "online"),
         )
 
     # -----------------------------------------------------------------

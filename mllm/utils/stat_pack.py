@@ -17,9 +17,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
-plt.style.use(
-    "https://raw.githubusercontent.com/dereckpiche/DedeStyle/refs/heads/main/dedestyle.mplstyle"
-)
+style_path = os.environ.get("ADALIGN_MPLSTYLE")
+if style_path:
+    plt.style.use(style_path)
 
 import wandb
 
