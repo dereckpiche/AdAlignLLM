@@ -19,7 +19,6 @@ import torch
 import torch.nn as nn
 from torch.optim import SGD, Adam, AdamW, RMSprop
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from trl import AutoModelForCausalLMWithValueHead
 
 from mllm.chat_utils.apply_template import chat_turns_to_token_ids
 from mllm.markov_games.rollout_tree import ChatTurn

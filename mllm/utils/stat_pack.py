@@ -15,7 +15,6 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple, TypedDict
 
 import matplotlib.pyplot as plt
 import numpy as np
-from torch.utils.tensorboard import SummaryWriter
 
 style_path = os.environ.get("ADALIGN_MPLSTYLE")
 if style_path:

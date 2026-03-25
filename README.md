@@ -17,10 +17,15 @@ Recommended: **Python ≥ 3.11** and **CUDA ≥ 12.4**.
 ```bash
 git clone https://github.com/dereckpiche/AdAlignLLM.git
 cd AdAlignLLM
-pip install -r requirements.txt
+pip install --index-url https://download.pytorch.org/whl/cu126 torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1
+pip install vllm==0.10.1.1
+pip install triton==3.3.1
+pip install transformers==4.57.1
 pip install flash-attn==2.8.3 --no-deps --no-build-isolation --no-binary flash-attn
+pip install -r requirements.txt
 pip install -e .
 ```
+
 
 For OpenAI API models:
 ```bash
