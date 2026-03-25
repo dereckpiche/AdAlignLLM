@@ -1,0 +1,6 @@
+defaults:
+    - tas_rps_naive.yaml
+
+experiment:
+    name: "tas_rps_naive_seed1337"
+    base_seed: 1337

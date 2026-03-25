@@ -1,0 +1,13 @@
+defaults:
+    - ipd_naive.yaml
+
+experiment:
+    name: "ipd_naive_qwen3_8b_seed1337"
+    base_seed: 1337
+
+models:
+    base_llm:
+        init_args:
+            model_name: Qwen/Qwen3-8B
+            enable_thinking: false
+            regex_max_attempts: 1

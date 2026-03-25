@@ -1,0 +1,12 @@
+defaults:
+    - ipd_naive.yaml
+
+experiment:
+    name: "ipd_naive_gemma3_4b"
+
+models:
+    base_llm:
+        init_args:
+            model_name: google/gemma-3-4b-it
+            enable_thinking: null
+            regex_max_attempts: 1

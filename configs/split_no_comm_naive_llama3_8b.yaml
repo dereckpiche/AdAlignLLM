@@ -1,0 +1,12 @@
+defaults:
+    - split_no_comm_naive.yaml
+
+experiment:
+    name: "split_no_comm_naive_llama3_8b"
+
+models:
+    base_llm:
+        init_args:
+            model_name: meta-llama/Llama-3.1-8B-Instruct
+            enable_thinking: null
+            regex_max_attempts: 1

@@ -1,0 +1,13 @@
+defaults:
+    - ipd_naive.yaml
+
+experiment:
+    name: "ipd_naive_llama3_8b_seed42"
+    base_seed: 42
+
+models:
+    base_llm:
+        init_args:
+            model_name: meta-llama/Llama-3.1-8B-Instruct
+            enable_thinking: null
+            regex_max_attempts: 1

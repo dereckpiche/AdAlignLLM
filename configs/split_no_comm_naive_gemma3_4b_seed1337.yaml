@@ -1,0 +1,13 @@
+defaults:
+    - split_no_comm_naive.yaml
+
+experiment:
+    name: "split_no_comm_naive_gemma3_4b_seed1337"
+    base_seed: 1337
+
+models:
+    base_llm:
+        init_args:
+            model_name: google/gemma-3-4b-it
+            enable_thinking: null
+            regex_max_attempts: 1

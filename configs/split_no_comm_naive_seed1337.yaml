@@ -1,0 +1,6 @@
+defaults:
+    - split_no_comm_naive.yaml
+
+experiment:
+    name: "split_no_comm_naive_seed1337"
+    base_seed: 1337

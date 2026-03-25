@@ -1,0 +1,6 @@
+defaults:
+    - ipd_naive.yaml
+
+experiment:
+    name: "ipd_naive_seed1337"
+    base_seed: 1337

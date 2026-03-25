@@ -1,0 +1,12 @@
+defaults:
+    - tas_rps_naive.yaml
+
+experiment:
+    name: "tas_rps_naive_qwen3_8b"
+
+models:
+    base_llm:
+        init_args:
+            model_name: Qwen/Qwen3-8B
+            enable_thinking: false
+            regex_max_attempts: 1
