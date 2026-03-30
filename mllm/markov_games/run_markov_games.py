@@ -25,11 +25,28 @@ async def run_markov_games(
     Parameters mirror the Hydra configs (runner callable + kwargs) so callers can
     choose ``LinearRunner``, ``AlternativeActionsRunner`` or future variants.
     """
+    runner_kwargs = dict(runner_kwargs)
+    max_parallel_games = runner_kwargs.pop("max_parallel_games", None)
+
+    async def run_game(markov_game: MarkovGame) -> RolloutTreeRootNode:
+        return await runner(
+            markov_game=markov_game,
+            output_folder=output_folder,
+            **runner_kwargs,
+        )
+
+    if max_parallel_games is not None:
+        semaphore = asyncio.Semaphore(max(1, int(max_parallel_games)))
+
+        async def run_game(markov_game: MarkovGame) -> RolloutTreeRootNode:
+            async with semaphore:
+                return await runner(
+                    markov_game=markov_game,
+                    output_folder=output_folder,
+                    **runner_kwargs,
+                )
+
     tasks = []
     for mg in markov_games:
-        tasks.append(
-            asyncio.create_task(
-                runner(markov_game=mg, output_folder=output_folder, **runner_kwargs)
-            )
-        )
+        tasks.append(asyncio.create_task(run_game(mg)))
     return await asyncio.gather(*tasks)

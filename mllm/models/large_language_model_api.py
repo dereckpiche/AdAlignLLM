@@ -32,6 +32,8 @@ reasoning_models = [
     "o4-mini",
     "o4",
     "o4-pro",
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
 ]
 
 
@@ -42,6 +44,8 @@ class LargeLanguageModelOpenAI:
         self,
         llm_id: str = "",
         model: str = "gpt-4.1-mini",
+        reasoning_effort: str = "low",
+        add_constraint_msg: bool = True,
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
         timeout_s: float = 300.0,
@@ -67,10 +71,11 @@ class LargeLanguageModelOpenAI:
         self.use_reasoning = model in reasoning_models
         if self.use_reasoning:
             self.sampling_params["reasoning"] = {
-                "effort": "low",
+                "effort": reasoning_effort,
                 "summary": "detailed",
             }
         self.regex_max_attempts = max(1, int(regex_max_attempts))
+        self.add_constraint_msg = add_constraint_msg
 
     def get_inference_policies(self) -> Dict[str, Callable]:
         return {
@@ -99,10 +104,14 @@ class LargeLanguageModelOpenAI:
 
     def extract_output_from_response(self, resp: Response) -> LLMInferenceOutput:
         if len(resp.output) > 1:
+            reasoning_content = resp.output[0].content
             summary = resp.output[0].summary
-            if summary != []:
-                reasoning_content = summary[0].text
-                reasoning_content = f"OpenAI Reasoning Summary: {reasoning_content}"
+            if reasoning_content is not None:
+                reasoning_content = (
+                    f"OpenAI Reasoning Content: {reasoning_content[0].text}"
+                )
+            elif summary != []:
+                reasoning_content = f"OpenAI Reasoning Summary: {summary[0].text}"
             else:
                 reasoning_content = None
             content = resp.output[1].content[0].text
@@ -132,14 +141,15 @@ class LargeLanguageModelOpenAI:
 
         # If regex is required, prime the model and validate client-side
         if regex:
-            constraint_msg = {
-                "role": "user",
-                "content": (
-                    f"Output must match this regex exactly: {regex} \n"
-                    "Return only the matching string, with no quotes or extra text."
-                ),
-            }
-            prompt = [constraint_msg, *prompt]
+            if self.add_constraint_msg:
+                constraint_msg = {
+                    "role": "user",
+                    "content": (
+                        f"Output must match this regex exactly: {regex} \n"
+                        "Return only the matching string, with no quotes or extra text."
+                    ),
+                }
+                prompt = [constraint_msg, *prompt]
             pattern = re.compile(regex)
             for _ in range(self.regex_max_attempts):
                 resp = await self.client.responses.create(

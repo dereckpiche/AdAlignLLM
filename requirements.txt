@@ -5,3 +5,4 @@ peft
 rstr
 wandb
 matplotlib
+google-genai

@@ -2,12 +2,13 @@ defaults:
     - tas_rps_naive.yaml
 
 experiment:
-    name: "tas_rps_naive_vs_open_ai"
+    name: "tas_rps_naive_vs_gemini"
     nb_epochs: 500
     nb_matches_per_iteration: 64
-    seed_group_size: 8
+    seed_group_size: 1
     train: true
     use_buffer: false
+
 agent_0_id: Alice
 agent_1_id: Bob
 agent_ids: ["Alice", "Bob"]
@@ -19,7 +20,7 @@ markov_games:
             policy_id: base_llm/agent_adapter
         1:
             agent_name: Bob
-            policy_id: openai_llm
+            policy_id: gemini_llm
 
 temperature: 1.0
 
@@ -33,16 +34,15 @@ optimizers:
             weight_decay: 0.0
 
 models:
-    openai_llm:
-        class: LargeLanguageModelOpenAI
+    gemini_llm:
+        class: LargeLanguageModelGemini
         init_args:
-            llm_id: openai_llm
-            model: gpt-5-nano # https://platform.openai.com/docs/pricing
-            base_url: https://api.openai.com/v1
+            llm_id: gemini_llm
+            model: gemini-3.1-flash-lite-preview
             timeout_s: 6000.0
             regex_max_attempts: 3
-            reasoning_effort: "low"
-            add_constraint_msg: false
+            thinking_level: low
+            include_thoughts: true
             sampling_params:
                 temperature: 1.0
                 top_p: 1.0
@@ -50,6 +50,8 @@ models:
     base_llm:
         init_args:
             regex_max_attempts: 3
+            initial_adapter_paths:
+                agent_adapter: /home/mila/m/mohammed.muqeeth/scratch/llm_negotiation/HF_checkpoints/tas_rps_naive_vs_gpt_oss_120b_low/seed_0/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter
             inference_backend_init_kwargs:
                 enable_prefix_caching: False
                 enforce_eager: False

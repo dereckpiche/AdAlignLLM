@@ -36,6 +36,7 @@ from mllm.markov_games.mg_utils import (
 from mllm.markov_games.run_markov_games import run_markov_games
 from mllm.models.human_policy import get_human_policies
 from mllm.models.large_language_model_api import LargeLanguageModelOpenAI
+from mllm.models.large_language_model_gemini_api import LargeLanguageModelGemini
 from mllm.models.large_language_model_local import LeanLocalLLM
 from mllm.models.scalar_critic import ScalarCritic
 from mllm.training.trainer_ad_align import TrainerAdAlign
@@ -115,7 +116,7 @@ async def generate_and_train(cfg: dict, base_seed: int) -> None:
     for llm_id, model_config in cfg["models"].items():
         if model_config is None:
             continue
-        model_class: LeanLocalLLM | LargeLanguageModelOpenAI = globals()[
+        model_class: LeanLocalLLM | LargeLanguageModelOpenAI | LargeLanguageModelGemini = globals()[
             model_config["class"]
         ]  # Server-backed LLMs are temporarily disabled until the backend is rebuilt.
         llms_dict[llm_id] = model_class(
