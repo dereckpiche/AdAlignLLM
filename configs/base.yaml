@@ -1,6 +1,6 @@
 hydra:
     run:
-        dir: "${oc.env:SCRATCH}/llm_negotiation/${now:%Y_%m}/${experiment.name}"
+        dir: "${oc.env:SCRATCH}/llm_negotiation/${experiment.name}"
     job:
         chdir: false
 
