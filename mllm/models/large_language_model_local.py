@@ -288,8 +288,8 @@ class LeanLocalLLM:
             )
             if (
                 pattern is None
-                or (pattern.fullmatch(policy_output.content))
                 or (nb_attempts >= self.regex_max_attempts)
+                or (pattern.fullmatch(policy_output.content))
             ):
                 return ChatTurn(
                     agent_id=agent_id,
