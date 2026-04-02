@@ -10,4 +10,6 @@ models:
         init_args:
             model_name: google/gemma-3-4b-it
             enable_thinking: null
-            regex_max_attempts: 1
+            regex_max_attempts: -1
+            inference_backend_sampling_params:
+                max_tokens: 20
