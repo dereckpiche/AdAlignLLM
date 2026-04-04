@@ -2,7 +2,7 @@ defaults:
     - tas_rps_naive.yaml
 
 experiment:
-    name: "tas_rps_naive_vs_fixed_ad_align"
+    name: "tas_rps_adv_vs_fixed_ad_align"
     nb_matches_per_iteration: 64
     seed_group_size: 8
     train: true
@@ -38,7 +38,7 @@ optimizers:
 models:
     base_llm:
         init_args:
-            regex_max_attempts: -1
+            regex_max_attempts: 3
             initial_adapter_paths:
                 fixed_ad_align_adapter: ${fixed_ad_align_adapter_path}
             adapter_configs:
@@ -48,6 +48,12 @@ models:
                     lora_alpha: 64
                     lora_dropout: 0.0
                     target_modules: all-linear
+
+trainers:
+    agent_trainer:
+        kwargs:
+            reward_agent_id: Bob
+            reward_scale: -1.0
 
 train_on_which_data:
     agent_trainer: ["Alice"]

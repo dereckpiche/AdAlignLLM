@@ -69,7 +69,12 @@ class TrainingChatTurn:
 
 
 def get_main_chat_list_and_rewards(
-    agent_id: str, root: RolloutTreeRootNode | RolloutTreeNode
+    agent_id: str,
+    root: RolloutTreeRootNode | RolloutTreeNode,
+    reward_agent_id: Optional[str] = None,
+    reward_scale: float = 1.0,
+    reward_peer_agent_id: Optional[str] = None,
+    reward_peer_scale: float = 0.0,
 ) -> Tuple[list[TrainingChatTurn], torch.FloatTensor]:
     """
     This method traverses a rollout tree and returns a the list of ChatTurn
@@ -83,11 +88,20 @@ def get_main_chat_list_and_rewards(
 
     chat = []
     rewards = []
+    reward_agent_id = reward_agent_id or agent_id
     while current_node is not None:
         if isinstance(current_node, RolloutTreeBranchNode):
             current_node = current_node.main_child
-        reward: float = current_node.step_log.simulation_step_log.rewards[agent_id]
-        rewards.append(reward)
+        reward: float = current_node.step_log.simulation_step_log.rewards[
+            reward_agent_id
+        ]
+        total_reward = reward_scale * reward
+        if reward_peer_agent_id is not None:
+            peer_reward: float = current_node.step_log.simulation_step_log.rewards[
+                reward_peer_agent_id
+            ]
+            total_reward += reward_peer_scale * peer_reward
+        rewards.append(total_reward)
         chat_turns: list[TrainingChatTurn] = current_node.step_log.action_logs[
             agent_id
         ].chat_turns

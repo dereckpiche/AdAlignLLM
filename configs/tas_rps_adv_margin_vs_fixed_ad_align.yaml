@@ -1,0 +1,13 @@
+defaults:
+    - tas_rps_adv_vs_fixed_ad_align.yaml
+
+experiment:
+    name: "tas_rps_adv_margin_vs_fixed_ad_align"
+
+trainers:
+    agent_trainer:
+        kwargs:
+            reward_agent_id: Alice
+            reward_scale: 1.0
+            reward_peer_agent_id: Bob
+            reward_peer_scale: -1.0

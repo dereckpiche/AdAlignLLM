@@ -92,6 +92,10 @@ class BaseTrainer(ABC):
         discount_factor: float,
         enable_tokenwise_logging: bool,
         save_path: str,
+        reward_agent_id: str | None = None,
+        reward_scale: float = 1.0,
+        reward_peer_agent_id: str | None = None,
+        reward_peer_scale: float = 0.0,
         reward_normalizing_constant: float = 1.0,
         critic_loss_type: Literal["mse", "huber"] = "huber",
         exploration_prompts_to_remove: list[str] = [],
@@ -203,6 +207,10 @@ class BaseTrainer(ABC):
             )
         self.discount_factor = discount_factor
         self.enable_tokenwise_logging = enable_tokenwise_logging
+        self.reward_agent_id = reward_agent_id
+        self.reward_scale = reward_scale
+        self.reward_peer_agent_id = reward_peer_agent_id
+        self.reward_peer_scale = reward_peer_scale
         self.reward_normalizing_constant = reward_normalizing_constant
         self.pg_loss_normalization = pg_loss_normalization
         self.critic_loss_type = critic_loss_type

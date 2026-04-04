@@ -1,0 +1,8 @@
+defaults:
+    - tas_rps_adv_margin_vs_fixed_ad_align.yaml
+
+experiment:
+    name: "tas_rps_adv_margin_vs_fixed_ad_align_seed4321"
+    base_seed: 4321
+
+fixed_ad_align_adapter_path: ${hf_checkpoints_root}/tas_rps_vanilla_ad_align_seed4321/seed_4321/Qwen/Qwen2.5-7B-Instruct/adapters/agent_adapter

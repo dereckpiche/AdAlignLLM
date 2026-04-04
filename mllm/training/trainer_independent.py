@@ -78,7 +78,14 @@ class TrainerNaive(BaseTrainer):
             )
             rollout_ids.append(rollout_id)
             crn_ids.append(root.crn_id)
-            chat, rewards = get_main_chat_list_and_rewards(agent_id=agent_id, root=root)
+            chat, rewards = get_main_chat_list_and_rewards(
+                agent_id=agent_id,
+                root=root,
+                reward_agent_id=self.reward_agent_id,
+                reward_scale=self.reward_scale,
+                reward_peer_agent_id=self.reward_peer_agent_id,
+                reward_peer_scale=self.reward_peer_scale,
+            )
             (
                 input_ids,
                 action_mask,
